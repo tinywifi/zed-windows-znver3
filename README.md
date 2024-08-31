@@ -1,13 +1,19 @@
 # Unofficial nightly builds of Zed for Windows
 
-## Installation
+## Warning
 
-Install using [Scoop](https://scoop.sh/)
+This is a personal repo built for my CPU with `-C target-cpu=alderlake`. You should not use this repo or its builds. Use the parent repo as it is generalized for any CPU.
 
+But if you're interested in getting nightly builds customized to your specific CPU, then fork this repo and run this cmd in your terminal:
+
+`rustc --target=x86_64-pc-windows-msvc --print target-cpus`
+
+At the top you'll see something like
 ```
-scoop bucket add versions
-scoop install versions/zed-nightly
+Available CPUs for this target:
+    native                  - Select the CPU of the current host (currently alderlake).
 ```
+In my case it was `alderlake`. In [build.yml](https://github.com/MolotovCherry/zed-windows-builds/blob/main/.github/workflows/build.yml), change the `alderlake` part in the `-C target-cpu=alderlake` to your specific CPU.
 
 ## Is it safe?
 
