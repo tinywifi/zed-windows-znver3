@@ -68,14 +68,17 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 Event::Start(t) => match t {
                     Tag::Heading { level, .. } => match level {
                         HeadingLevel::H2 => "## ".to_owned(),
-                        _ => unimplemented!(),
+                        h => unimplemented!("heading level unimplemented {h:?}"),
                     },
                     Tag::Table(_) => "\n| - | - |".to_owned(),
                     Tag::TableHead => "\n".to_owned(),
                     Tag::TableRow => "\n".to_owned(),
                     Tag::TableCell => "|".to_owned(),
                     Tag::Link { .. } => "".to_owned(),
-                    _ => unimplemented!(),
+                    Tag::CodeBlock(_) => "```\n".to_owned(),
+                    Tag::Strikethrough => "~~".to_owned(),
+                    Tag::Strong => "**".to_owned(),
+                    _ => unimplemented!("tag unimplemented: {t:?}"),
                 },
                 Event::End(t) => match t {
                     TagEnd::Table => "".to_owned(),
@@ -84,11 +87,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     TagEnd::TableCell => "".to_owned(),
                     TagEnd::Heading(_) => "".to_owned(),
                     TagEnd::Link => "".to_owned(),
-                    _ => unimplemented!(),
+                    TagEnd::CodeBlock => "\n```".to_owned(),
+                    TagEnd::Strikethrough => "~~".to_owned(),
+                    TagEnd::Strong => "**".to_owned(),
+                    t => unimplemented!("tagend unimplemented: {t:?}"),
                 },
                 Event::Text(t) => t.to_string(),
+                Event::Code(c) => format!("`{c}`"),
 
-                _ => unimplemented!(),
+                e => unimplemented!("event unimplemented: {e:?}"),
             })
             .collect::<String>();
 
