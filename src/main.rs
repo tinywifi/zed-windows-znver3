@@ -3,6 +3,7 @@ use std::fs;
 use std::io::Cursor;
 use std::path::Path;
 
+use pulldown_cmark::{Event, HeadingLevel, Options, Parser, Tag, TagEnd};
 use zip::read::ZipArchive;
 
 #[tokio::main]
@@ -59,8 +60,56 @@ async fn main() -> Result<(), Box<dyn Error>> {
     }
 
     if let Some(body) = latest.body {
-        println!("\n{}", termimad::term_text(&body));
+        let mut options = Options::empty();
+        options.insert(Options::ENABLE_TABLES);
+        let parser = Parser::new_ext(&body, options);
+        let data = parser
+            .map(|event| match event {
+                Event::Start(t) => match t {
+                    Tag::Heading { level, .. } => match level {
+                        HeadingLevel::H2 => "## ".to_owned(),
+                        _ => unimplemented!(),
+                    },
+                    Tag::Table(_) => "\n| - | - |".to_owned(),
+                    Tag::TableHead => "\n".to_owned(),
+                    Tag::TableRow => "\n".to_owned(),
+                    Tag::TableCell => "|".to_owned(),
+                    Tag::Link { .. } => "".to_owned(),
+                    _ => unimplemented!(),
+                },
+                Event::End(t) => match t {
+                    TagEnd::Table => "".to_owned(),
+                    TagEnd::TableHead => "|".to_owned(),
+                    TagEnd::TableRow => "|".to_owned(),
+                    TagEnd::TableCell => "".to_owned(),
+                    TagEnd::Heading(_) => "".to_owned(),
+                    TagEnd::Link => "".to_owned(),
+                    _ => unimplemented!(),
+                },
+                Event::Text(t) => t.to_string(),
+
+                _ => unimplemented!(),
+            })
+            .collect::<String>();
+
+        println!("\n{}", termimad::term_text(&data));
+        pause();
     }
 
     Ok(())
+}
+
+fn pause() {
+    use std::io::Read;
+    use std::io::Write;
+
+    let mut stdin = std::io::stdin();
+    let mut stdout = std::io::stdout();
+
+    // We want the cursor to stay at the end of the line, so we print without a newline and flush manually.
+    write!(stdout, "Press any key to continue...").unwrap();
+    stdout.flush().unwrap();
+
+    // Read a single byte and discard
+    let _ = stdin.read(&mut [0u8]).unwrap();
 }
