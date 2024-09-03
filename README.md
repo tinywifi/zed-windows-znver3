@@ -15,6 +15,10 @@ Available CPUs for this target:
 ```
 In my case it was `alderlake`. In [build.yml](https://github.com/MolotovCherry/zed-windows-builds/blob/main/.github/workflows/build.yml), change the `alderlake` part in the `-C target-cpu=alderlake` to your specific CPU.
 
+## App
+
+This repo also contains a Rust app that downloads the latest release from your repo and extracts the file to the same directory. That way you don't have to bother downloading from the repo and extracting the archive. If you wish to use it with your own repo, change the owner and repo name in the file so it points to your repo. Technically you could also use this app with the parent repo which was generalized for any CPU.
+
 ## Is it safe?
 
 This repository is just a [simple GitHub workflow](./.github/workflows/build.yml) that builds Zed from `main` and publishes a release every night at UTC+0000. (Additionally on push for testing).
