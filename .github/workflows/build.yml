@@ -63,7 +63,7 @@ jobs:
 
       - name: Build release
         env:
-          RUSTFLAGS: -C target-cpu=alderlake
+          RUSTFLAGS: -C target-cpu=znver3
         run: |
           cargo build --release --color always
 
